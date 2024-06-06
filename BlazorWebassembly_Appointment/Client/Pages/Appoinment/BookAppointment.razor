@@ -1,0 +1,344 @@
+﻿@page "/appointments/book/{DoctorId:int}"
+@inject NavigationManager Navigation
+@inject BlazorWebassembly_Appointment.Client.Services.DoctorService DoctorService
+ 
+@using BlazorWebassembly_Appointment.Shared
+@using System
+
+<style>
+    body {
+        background-color: #f8f9fa;
+        background-image: url('/Images/Clinic_background.jpg');
+        opacity: 0.9;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+    }
+</style>
+
+<div class="container">
+    <div class="back_arrow_div">
+        <button class="back_button">
+            <span class="newback_btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                    <path d="M0 0h24v24H0z" fill="none" />
+                    <path d="M14 7l-5 5 5 5V7z" />
+                </svg>
+            </span>
+        </button>
+    </div>
+    <div class="side_panel_container">
+        <div class="sidepanel_mini_container">
+            <div class="init">
+                <div class="simplebar-wrapper">
+                    <div class="simplebar-height-auto-observer-wrapper">
+                        <div class="simplebar-height-auto-observer"></div>
+                    </div>
+                    <div class="simplebar-mask">
+                        <div class="simplebar-offset">
+                            <div class="simplebar-content-wrapper">
+                                <div class="simplebar-content">
+                                    <div class="context_main">
+                                        <div class="contaxt_minute_div">
+                                            <div class="name_heading_div_class">
+                                                <input id="doctor" name="doctor" style="border:none;font-size: x-large;font-weight: 600;" value="@doctor.Name" readonly />
+                                            </div>
+                                            <div style="margin-top: 23px;">
+                                              <h1 class="minute_heading_div_class">30 Minute Meeting</h1>
+                                            </div>
+                                        </div>
+                                        <div class="context_sub_minute_div">
+                                            <div class="detailclass">
+                                                <div class="min_detail_div">
+                                                    <div class="min_spantag_div">
+                                                        <span aria-hidden="true" class="min_span">
+                                                            <svg data-id="details-item-icon" viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg" role="img">
+                                                                <path d="M.5 5a4.5 4.5 0 1 0 9 0 4.5 4.5 0 1 0-9 0Z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"></path>
+                                                                <path d="M5 3.269V5l1.759 2.052" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"></path>
+                                                            </svg>
+                                                        </span>
+                                                    </div>
+                                                    30 &nbsp; min
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="simplebar-placeholder"></div>
+                </div>
+                <div class="simplebar-track simplebar-horizontal">
+                    <div class="simplebar-scrollbar"></div>
+                </div>
+                <div class="simplebar-track simplebar-vertical">
+                    <div class="simplebar-scrollbar"></div>
+                </div>
+            </div>
+            <span></span>
+        </div>
+    </div>
+
+    <div class="slecttime_head_container">
+        <div class="slecttime_head_container_main">
+            <h2 class="time_main_heading">Select a Date &amp; Time</h2>
+
+            <div class="datepicker_class">
+                <div class="spotpicker_dates">
+                    <div class="spotpicker_subdates">
+                        <div class="calender_main_class">
+                            <!-- Calendar -->
+                            <div class="month-navigation">
+                                <button class="gotoprvbutton" @onclick="PrevMonth">
+                                    <i class="fa fa-chevron-left"></i>
+                                </button>
+                                <span class="currentmonth_style">@currentMonth</span>
+                                <button class="gotonxtbutton" @onclick="NextMonth">
+                                    <i class="fa fa-chevron-right"></i>
+                                </button>
+                            </div>
+                            <div class="main_calender_container">
+                                <table class="calendar">
+                                    <thead>
+                                        @*   <tr>
+                                        <th colspan="7">
+                                        <span>@currentMonth</span>
+                                        </th>
+                                        </tr> *@
+                                        <tr>
+                                            <th>Sun</th>
+                                            <th>Mon</th>
+                                            <th>Tue</th>
+                                            <th>Wed</th>
+                                            <th>Thu</th>
+                                            <th>Fri</th>
+                                            <th>Sat</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var week in calendar)
+                                        {
+                                            <tr>
+                                                @foreach (var day in week)
+                                                {
+                                                    <td class="@day.CssClass" @onclick="() => SelectDate(day.Date)">
+                                                        @day.Date.Day
+                                                    </td>
+                                                }
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div></div>
+                    </div>
+                </div>
+                <div class="spotpicker_times">
+                    <h3 class="selected_dateclass"><span>@selectedDate.ToShortDateString()</span></h3>
+                    <div class="spotpicker_times_list">
+                        <div id="time-buttons">
+                            @foreach (var slot in timeSlots)
+                            {
+                                <button class="@GetSlotClass(slot)" @onclick="() => BookSlot(slot)">@slot</button>
+                            }
+                        </div>
+                        @if (showNextButton)
+                        {
+                            <button class="next-button" @onclick="NextButtonClicked">Next</button>
+                        }
+                    </div>
+                </div>
+            </div>
+            <div></div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public int DoctorId { get; set; }
+    private DoctorDetail doctor = new DoctorDetail();
+   
+
+    [Parameter] public List<string> SelectedSlotsList { get; set; }
+    [Parameter] public List<string> SelectedDatesList { get; set; }
+
+    private List<List<CalendarDay>> calendar = new List<List<CalendarDay>>();
+    private DateTime currentDate = DateTime.Now;
+    private string currentMonth;
+    private DateTime selectedDate;
+    private List<string> timeSlots = new List<string>();
+    private List<string> bookedSlots = new List<string>();
+
+    // protected override void OnInitialized()
+    // {
+    //     LoadCalendar();
+    // }
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Fetch the doctor details using the DoctorId
+        doctor = await DoctorService.GetDoctor(DoctorId);
+
+        // Load the calendar and other necessary data
+        LoadCalendar();
+    }
+
+    private void LoadCalendar()
+    {
+        currentMonth = currentDate.ToString("MMMM yyyy");
+        calendar = GenerateCalendar(currentDate);
+    }
+
+    private List<List<CalendarDay>> GenerateCalendar(DateTime date)
+    {
+        var calendar = new List<List<CalendarDay>>();
+        var firstDayOfMonth = new DateTime(date.Year, date.Month, 1);
+        var daysInMonth = DateTime.DaysInMonth(date.Year, date.Month);
+        var dayOfWeek = (int)firstDayOfMonth.DayOfWeek;
+
+        var currentDay = 1;
+        for (int i = 0; i < 6; i++)
+        {
+            var week = new List<CalendarDay>();
+            for (int j = 0; j < 7; j++)
+            {
+                if (i == 0 && j < dayOfWeek || currentDay > daysInMonth)
+                {
+                    week.Add(new CalendarDay { CssClass = "empty" });
+                }
+                else
+                {
+                    var day = new DateTime(date.Year, date.Month, currentDay);
+                    week.Add(new CalendarDay { Date = day, CssClass = "available" });
+                    currentDay++;
+                }
+            }
+            calendar.Add(week);
+        }
+
+        return calendar;
+    }
+
+    private void PrevMonth()
+    {
+        currentDate = currentDate.AddMonths(-1);
+        LoadCalendar();
+    }
+
+    private void NextMonth()
+    {
+        currentDate = currentDate.AddMonths(1);
+        LoadCalendar();
+    }
+
+    private void SelectDate(DateTime date)
+    {
+        selectedDate = date;
+        LoadTimeSlots();
+    }
+
+    private void LoadTimeSlots()
+    {
+        // Replace with your logic to load time slots for the selected date
+        timeSlots = new List<string> { "10:00 AM", "10:30 AM", "11:00 AM","11:30 AM","12:00 AM","01:00 PM","1:30 PM" };
+    }
+
+    private bool showNextButton = false;
+
+    private string GetSlotClass(string slot)
+    {
+        return IsSlotBooked(slot) ? "booked" : "available-slot";
+    }
+
+    private bool IsSlotBooked(string slot)
+    {
+        // Your logic to check if the slot is already booked
+        // For example, you can check against a list of booked slots
+        // Replace this with your actual logic
+        return bookedSlots.Contains(slot);
+    }
+    private void BookSlot(string slot)
+    {
+        if (!IsSlotBooked(slot))
+        {
+            Navigation.NavigateTo($"/confirm-booking/{DoctorId}/{selectedDate.ToString("yyyy-MM-dd")}/{Uri.EscapeDataString(slot)}");
+            Console.WriteLine($"Booked {slot} on {selectedDate.ToShortDateString()}");
+           
+        }
+        else
+        {
+            
+            Navigation.NavigateTo("/calenderSubmit");
+            Console.WriteLine($"Slot {slot} is already booked");
+            showNextButton = true; 
+        }
+    }
+
+    private void NextButtonClicked()
+    {
+        Navigation.NavigateTo("/calenderSubmit");
+    }
+
+
+    private class CalendarDay
+    {
+        public DateTime Date { get; set; }
+        public string CssClass { get; set; }
+    }
+
+    private void GenerateCalendarJS(int month, int year)
+    {
+        var currentDate = new DateTime(year, month, 1);
+        var daysInMonth = DateTime.DaysInMonth(year, month);
+        var firstDayOfMonth = (int)currentDate.DayOfWeek;
+
+        int date = 1;
+        var tableBody = new List<List<CalendarDay>>();
+
+        for (int i = 0; i < 6; i++)
+        {
+            var row = new List<CalendarDay>();
+            for (int j = 0; j < 7; j++)
+            {
+                if (i == 0 && j < firstDayOfMonth)
+                {
+                    row.Add(new CalendarDay { CssClass = "empty" });
+                }
+                else if (date > daysInMonth)
+                {
+                    break;
+                }
+                else
+                {
+                    var cellDate = new DateTime(year, month, date);
+                    row.Add(new CalendarDay { Date = cellDate, CssClass = "available" });
+                    date++;
+                }
+            }
+            tableBody.Add(row);
+        }
+        calendar = tableBody;
+    }
+
+    private void DisplayAvailableSlots(DateTime selectedDate)
+    {
+        timeSlots.Clear();
+
+        if (selectedDate.DayOfWeek != DayOfWeek.Sunday)
+        {
+            for (int hour = 9; hour <= 17; hour++)
+            {
+                for (int minute = 0; minute < 60; minute += 30)
+                {
+                    var slot = new DateTime(selectedDate.Year, selectedDate.Month, selectedDate.Day, hour, minute, 0);
+                    timeSlots.Add(slot.ToShortTimeString());
+                }
+            }
+        }
+    }
+}
+

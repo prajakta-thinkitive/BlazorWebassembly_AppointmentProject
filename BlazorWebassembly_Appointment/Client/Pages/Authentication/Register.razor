@@ -1,0 +1,154 @@
+﻿@page "/register"
+@inject BlazorWebassembly_Appointment.Client.Services.AuthService AuthService
+@inject BlazorWebassembly_Appointment.Client.Services.UserStateService UserStateService
+
+
+@inject NavigationManager NavigationManager
+@using BlazorWebassembly_Appointment.Shared
+
+@code {
+    private RegisterUser model = new RegisterUser();
+    private string selectedRole = "User"; // default role
+    private string errorMessage;
+
+    private async Task HandleRegister()
+    {
+
+        var success = await AuthService.Register(model, selectedRole);
+        if (success)
+        {
+            var loggedInUser = await AuthService.GetLoggedInUser();
+            UserStateService.SetLoggedInUser(loggedInUser);
+            NavigationManager.NavigateTo("/login");
+        }
+        else
+        {
+            errorMessage = "Registration failed. Please try again.";
+        }
+
+
+        if (string.IsNullOrEmpty(model.ProfileImage))
+        {
+            model.ProfileImage = "default_profile_image.png"; 
+        }
+    }
+
+    private void OnRoleChanged(ChangeEventArgs e)
+    {
+        selectedRole = e.Value.ToString();
+    }
+
+}
+
+<div class="register-container">
+    <h2>Register</h2>
+    <EditForm Model="@model" OnValidSubmit="HandleRegister">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <div class="form-group">
+            <label for="UserName">Enter UserName</label>
+            <InputText id="UserName" class="form-control" @bind-Value="model.UserName" />
+        </div>
+        <div class="form-group">
+            <label for="Email">Enter Email</label>
+            <InputText id="Email" class="form-control" @bind-Value="model.Email" />
+        </div>
+        <div class="form-group">
+            <label for="Password">Enter Password</label>
+            <InputText id="Password" type="password" class="form-control" @bind-Value="model.Password" />
+        </div>
+        <div class="form-group">
+            <label for="Role">Role</label>
+            <InputSelect id="Role" class="form-control" @bind-Value="selectedRole" @onchange="OnRoleChanged">
+                <option value="Doctor">Doctor</option>
+                <option value="Admin">Admin</option>
+                <option value="User">User</option>
+            </InputSelect>
+        </div>
+
+        @if (selectedRole == "Doctor")
+        {
+            <div>
+                <div class="form-group">
+                    <label for="Specialty">Specialty</label>
+                    <InputText id="Specialty" class="form-control" @bind-Value="model.Specialty" />
+                </div>
+                <div class="form-group">
+                    <label for="MobileNumber">Mobile Number</label>
+                    <InputText id="MobileNumber" class="form-control" @bind-Value="model.MobileNumber" />
+                </div>
+                <div class="form-group">
+                    <label for="Education">Education</label>
+                    <InputText id="Education" class="form-control" @bind-Value="model.Education" />
+                </div>
+                <div class="form-group">
+                    <label for="Treatment">Treatment</label>
+                    <InputText id="Treatment" class="form-control" @bind-Value="model.Treatment" />
+                </div>
+                <div class="form-group">
+                    <label for="ProfileImage">Profile Image</label>
+                    <InputFile id="ProfileImage" class="form-control" @bind-value="model.ProfileImage" />
+                </div>
+            </div>
+
+        }
+
+        <div class="form-buttons" style="display:flex">
+            <button type="submit" class="btn btn-primary">Register</button>
+        </div>
+            <a href="/login">Login</a>
+     
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <div class="alert alert-danger">@errorMessage</div>
+        }
+    </EditForm>
+</div>
+
+<style>
+    .register-container {
+        background-color: #ffffff;
+        padding: 60px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        max-width: 400px;
+        width: 100%;
+        margin-left: auto;
+        margin-right: auto;
+        margin-top: 2%;
+    }
+
+    h2 {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .form-control {
+        border-radius: 4px;
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 10px;
+        border: 1px solid #ccc;
+    }
+
+    .btn-primary {
+       
+        padding: 10px;
+        background-color: #007bff;
+        border: none;
+        border-radius: 4px;
+        color: white;
+    }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+
+    .text-danger {
+        color: red;
+    }
+</style>

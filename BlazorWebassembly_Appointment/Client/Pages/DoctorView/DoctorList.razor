@@ -1,0 +1,291 @@
+﻿@page "/doctors"
+@inject BlazorWebassembly_Appointment.Client.Services.DoctorService DoctorService
+@inject BlazorWebassembly_Appointment.Client.Services.AuthService AuthService
+@inject BlazorWebassembly_Appointment.Client.Services.UserStateService UserStateService
+@inject NavigationManager NavigationManager
+@using BlazorWebassembly_Appointment.Client.Component
+@using BlazorWebassembly_Appointment.Shared
+@using BlazorWebassembly_Appointment.Shared.Dtos
+@inject Blazored.Modal.Services.IModalService ModalService
+
+
+
+<style>
+
+    body {
+        background-color: #f8f9fa;
+        background-image: url('/Images/Clinic_background.jpg');
+        opacity: 0.9;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+    }
+
+    .container {
+        background-color: #ffffff;
+        overflow-y: scroll;
+        height: 516px;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+      
+        width: 100%;
+        margin: 50px auto;
+    }
+    h3 {
+        color: #333;
+        margin-bottom: 20px;
+    }
+
+    /* Style for the table */
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+        border-spacing: 0;
+        background-color: #fff;
+        border: 1px solid #ddd;
+    }
+
+        /* Style for table header */
+        .table th {
+            font-weight: bold;
+            padding: 8px;
+            border: 1px solid #ddd;
+        }
+
+        /* Style for table body */
+        .table td {
+            padding: 8px;
+            border: 1px solid #ddd;
+        }
+
+        /* Style for alternate rows */
+        .table tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+    /* Style for action buttons */
+    .btn-group .btn {
+        margin-right: 5px;
+    }
+
+        /* Style for action buttons icons */
+        .btn-group .btn i {
+            margin-right: 5px;
+        }
+
+    /* Style for action buttons colors */
+    .btn-primary {
+        background-color: #007bff;
+        border-color: #007bff;
+    }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+            border-color: #0056b3;
+        }
+
+    .btn-warning {
+        background-color: #ffc107;
+        border-color: #ffc107;
+    }
+
+        .btn-warning:hover {
+            background-color: #d39e00;
+            border-color: #d39e00;
+        }
+
+    .btn-danger {
+        background-color: #dc3545;
+        border-color: #dc3545;
+    }
+
+        .btn-danger:hover {
+            background-color: #bd2130;
+            border-color: #bd2130;
+        }
+
+    h3 {
+        color: #333;
+        margin-bottom: 20px;
+    }
+
+    .main_heading {
+        display: flex;
+        justify-content: space-around;
+    }
+
+    .search-box {
+        margin-top: 20px;
+        display: flex;
+        justify-content: center;
+    }
+
+        .search-box input {
+            width: 300px;
+            padding: 5px;
+            margin-right: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+        }
+
+        .search-box button {
+            padding: 6px 12px;
+            border: 1px solid #007bff;
+            background-color: #007bff;
+            color: #fff;
+            border-radius: 4px;
+        }
+
+    .createnew_btn {
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 20px;
+    }
+
+
+</style>
+
+<div class="container">
+
+    <div class="main_heading">
+        <h2 style="font-weight: 400;margin-top: 20px;">Search Doctor, Make an Appointment</h2>
+    </div>
+
+    <div class="search-box">
+        <form @onsubmit="SearchDoctors" href="Index" method="get" style="display:flex">
+            <input type="text" @bind="searchTerm" placeholder="Search by name or specialty" class="form-control" />
+            <button @onclick="SearchDoctors" type="submit" class="btn btn-primary">Search</button>
+        </form>
+    </div>
+
+    <div class="createnew_btn">
+        @if(UserStateService.LoggedInUser.Role == "Admin")
+        {
+            <div class="admin-actions">
+                <a href="doctors/view-all" class="btn btn-info" type="button">View All Doctors</a>
+                <a href="patients/view-all" class="btn btn-info" type="button">View All Patients</a>
+            </div>
+            <a href="doctors/create" class="btn btn-primary" type="button">Create Patient</a>
+        }
+
+        @if (UserStateService.LoggedInUser.Role == "Doctor")
+        {
+            <a href="doctors/create" class="btn btn-primary" type="button">Create Patient</a>
+        }
+    </div>
+
+  
+
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Name</th>
+            <th>Specialty</th>
+            <th>Email</th>
+            <th>Mobile Number</th>
+            <th>Education</th>
+            <th>Treatment</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var doctor in doctors)
+        {
+            <tr>
+                <td>@doctor.Id</td>
+                <td>@doctor.Name</td>
+                <td>@doctor.Specialty</td>
+                <td>@doctor.Email</td>
+                <td>@doctor.MobileNumber</td>
+                <td>@doctor.Education</td>
+                <td>@doctor.Treatment</td>
+                <td>
+                        @if (UserStateService.LoggedInUser.Role == "Admin")
+                        {
+                            <button @onclick="() => EditDoctor(doctor.Id)" class="btn btn-warning"><i class="fa fa-edit icon-style"></i></button>
+                            <button @onclick="() => DeleteDoctor(doctor.Id)" class="btn btn-danger"><i class="fa fa-trash icon-style"></i></button>
+                            <button @onclick="() => ViewDetails(doctor.Id)" class="btn btn-info"><i class="fa fa-address-card icon-style"></i></button>
+                            <button @onclick="() => ViewAppointments(doctor.Id)" class="btn btn-primary"><i class="fa fa-calendar icon-style"></i></button>
+                        }
+                        else if (UserStateService.LoggedInUser.Role == "Doctor")
+                        {
+                            <button @onclick="() => EditDoctor(doctor.Id)" class="btn btn-warning"><i class="fa fa-edit icon-style"></i></button>
+                            <button @onclick="() => ViewDetails(doctor.Id)" class="btn btn-info"><i class="fa fa-address-card icon-style"></i></button>
+                            <button @onclick="() => ViewAppointments(doctor.Id)" class="btn btn-primary"><i class="fa fa-calendar icon-style"></i></button>
+                        }
+                        else if (UserStateService.LoggedInUser.Role == "User")
+                        {
+                            <button @onclick="() => ViewDetails(doctor.Id)" class="btn btn-info"><i class="fa fa-address-card icon-style"></i></button>
+                        }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+</div>
+
+
+@code {
+    // private async Task OpenPopup()
+    // {
+       
+    //     var modal = ModalService.Show<DoctorViewAllModal>("Popup Title");
+    //     var result = await modal.Result;
+    // }
+
+    private List<DoctorDetail> doctors = new List<DoctorDetail>();
+    private CurrentUserDto userInfo = new CurrentUserDto();
+
+    private string searchTerm;
+    [Parameter] public int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        doctors = await DoctorService.GetDoctors();
+        // UserStateService.SetLoggedInUser(userInfo.Role);
+        //userInfo = await AuthService.GetLoggedInUser();
+    }
+
+    private async Task SearchDoctors()
+    {
+        if (!string.IsNullOrWhiteSpace(searchTerm))
+        {
+            doctors = await DoctorService.SearchDoctors(searchTerm);
+        }
+        else
+        {
+            doctors = await DoctorService.GetDoctors();
+        }
+    }
+
+    private void ViewAppointments(int id)
+    {
+        NavigationManager.NavigateTo($"/doctors/{id}/appointments");
+    }
+
+    private void EditDoctor(int id)
+    {
+        NavigationManager.NavigateTo($"/editdoctor/{id}");
+
+    }
+
+    private async Task DeleteDoctor(int id)
+    {
+        await DoctorService.DeleteDoctor(id);
+        doctors = await DoctorService.GetDoctors(); 
+    }
+
+     private void ViewDetails(int id)
+    {
+        NavigationManager.NavigateTo($"/doctors/details/{id}");
+    }
+    private void CreateDoctor()
+    {
+        NavigationManager.NavigateTo("/doctors/create");
+    }
+}

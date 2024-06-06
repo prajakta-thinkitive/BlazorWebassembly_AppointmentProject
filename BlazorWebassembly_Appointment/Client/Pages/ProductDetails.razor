@@ -1,0 +1,29 @@
+﻿@page "/products/details/{id:int}"
+@inject BlazorWebassembly_Appointment.Client.Services.ProductService ProductService
+@using BlazorWebassembly_Appointment.Shared
+@inject NavigationManager NavigationManager
+
+<h3>Product Details</h3>
+
+@if (product == null)
+{
+        <p><em>Loading...</em></p>
+}
+else
+{
+        <div>
+            <p>Id: @product.Id</p>
+            <p>Name: @product.Name</p>
+            <p>Price: @product.Price</p>
+        </div>
+}
+
+@code {
+    [Parameter] public int id { get; set; }
+    private Product product;
+
+    protected override async Task OnInitializedAsync()
+    {
+        product = await ProductService.GetProduct(id);
+    }
+}

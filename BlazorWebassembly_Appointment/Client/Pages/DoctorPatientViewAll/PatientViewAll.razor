@@ -1,0 +1,76 @@
+﻿@page "/patients/view-all"
+@using BlazorWebassembly_Appointment.Shared
+@inject BlazorWebassembly_Appointment.Client.Services.AppointmentService AppointmentService
+
+<style>
+    body {
+        background-color: #f8f9fa;
+        background-image: url('/Images/Clinic_background.jpg');
+        opacity: 0.9;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+    }
+
+    .container {
+        background-color: #ffffff;
+        overflow-y: scroll;
+        height: 516px;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        margin: 50px auto;
+    }
+
+    h3 {
+        color: #333;
+        margin-bottom: 20px;
+    }
+</style>
+
+<div class="container">
+    <h2>Registered Appointments</h2>
+
+    
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var appointment in appointments)
+                {
+                    <tr>
+                        <td>@appointment.Name</td>
+                        <td>@appointment.Email</td>
+                        <td>@appointment.Description</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    
+
+</div>
+
+@code {
+    private List<AppointmentModel> appointments;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            appointments = await AppointmentService.GetAllAppointments();
+        }
+        catch (Exception ex)
+        {
+            // Handle exception
+            Console.WriteLine($"Error fetching appointments: {ex.Message}");
+        }
+    }
+}
+

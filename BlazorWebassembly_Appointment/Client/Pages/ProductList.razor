@@ -1,0 +1,59 @@
+﻿@page "/products"
+@inject BlazorWebassembly_Appointment.Client.Services.ProductService ProductService
+@inject NavigationManager NavigationManager
+@using BlazorWebassembly_Appointment.Shared
+
+<h3>Products</h3>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Name</th>
+            <th>Price</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var product in products)
+        {
+            <tr>
+                <td>@product.Id</td>
+                <td>@product.Name</td>
+                <td>@product.Price</td>
+                <td>
+                    <button @onclick="() => EditProduct(product.Id)">Edit</button>
+                    <button @onclick="() => DeleteProduct(product.Id)">Delete</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    private List<Product> products = new List<Product>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            products = await ProductService.GetProducts();
+        }
+        catch (Exception ex)
+        {
+            // Handle exception (log it, show message to user, etc.)
+            Console.WriteLine($"Error fetching products: {ex.Message}");
+        }
+    }
+
+    private void EditProduct(int id)
+    {
+        NavigationManager.NavigateTo($"/products/edit/{id}");
+    }
+
+    private async Task DeleteProduct(int id)
+    {
+        await ProductService.DeleteProduct(id);
+        products = await ProductService.GetProducts(); // Refresh the list
+    }
+}

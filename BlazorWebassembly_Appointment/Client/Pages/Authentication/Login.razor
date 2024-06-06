@@ -1,0 +1,91 @@
+﻿@page "/login"
+@inject BlazorWebassembly_Appointment.Client.Services.AuthService AuthService
+@inject BlazorWebassembly_Appointment.Client.Services.UserStateService UserStateService
+@inject NavigationManager NavigationManager
+@using BlazorWebassembly_Appointment.Shared
+
+
+@code {
+    private LoginUser model = new LoginUser();
+
+    private async Task HandleLogin()
+    {
+        var success = await AuthService.Login(model);
+        if (success)
+        {
+            var loggedInUser = await AuthService.GetLoggedInUser();
+            UserStateService.SetLoggedInUser(loggedInUser);
+            NavigationManager.NavigateTo("/doctors");
+        }
+        else
+        {
+            // errorMessage = "Registration failed. Please try again.";
+        }
+    }
+}
+
+<div class="login-container">
+    <h2>Login</h2>
+    <EditForm Model="@model" OnValidSubmit="HandleLogin">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <div class="form-group">
+            <label for="Email" class="control-label">Email</label>
+            <InputText id="Email" class="form-control" @bind-Value="model.Email" />
+        </div>
+        <div class="form-group">
+            <label for="Password" class="control-label">Password</label>
+            <InputText id="Password" class="form-control" type="password" @bind-Value="model.Password" />
+        </div>
+        <button type="submit" class="btn btn-primary">Login</button>
+        <span>New user?</span>&nbsp;<a href="register" type="submit">register</a>
+    </EditForm>
+</div>
+
+<style>
+    .login-container {
+        background-color: #ffffff;
+        padding: 60px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        max-width: 400px;
+        width: 100%;
+        margin-left: auto;
+        margin-right: auto;
+        margin-top: 2%;
+    }
+
+    h2 {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .form-control {
+        border-radius: 4px;
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 10px;
+        border: 1px solid #ccc;
+    }
+
+    .btn-primary {
+        width: 100%;
+        padding: 10px;
+        background-color: #007bff;
+        border: none;
+        border-radius: 4px;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background-color: #0056b3;
+    }
+
+    .text-danger {
+        color: red;
+    }
+</style>

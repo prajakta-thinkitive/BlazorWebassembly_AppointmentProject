@@ -1,0 +1,149 @@
+﻿@inherits LayoutComponentBase
+@inject BlazorWebassembly_Appointment.Client.Services.UserStateService UserStateService
+@inject BlazorWebassembly_Appointment.Client.Services.AuthService AuthService
+@inject NavigationManager NavigationManager
+@using BlazorWebassembly_Appointment.Shared
+@using BlazorWebassembly_Appointment.Shared.Dtos
+
+
+<style>
+
+    
+
+    .content {
+        margin-top: 60px; 
+    }
+
+    .fixed-top {
+        position: fixed;
+        top: 0;
+        width: 100%;
+        background-color: #343a40; 
+        color: white; /* White text color */
+        padding: 10px 20px; 
+        z-index: 1030; 
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
+    }
+
+    .content {
+        margin-top: 60px; 
+    }
+
+    .dropdown {
+        position: relative;
+        display: inline-block;
+    }
+
+    .dropdown-menu {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        z-index: 1000;
+        display: none;
+        float: left;
+        min-width: 10rem;
+        padding: .5rem 0;
+        margin: .125rem 0 0;
+        font-size: 1rem;
+        color: #212529;
+        text-align: left;
+        list-style: none;
+        background-color: #fff;
+        background-clip: padding-box;
+        border: 1px solid rgba(0, 0, 0, .15);
+        border-radius: .25rem;
+    }
+
+        .dropdown-menu.show {
+            display: block;
+        }
+
+    .dropdown-item {
+        display: block;
+        width: 100%;
+        padding: .25rem 1.5rem;
+        clear: both;
+        font-weight: 400;
+        color: #212529;
+        text-align: inherit;
+        white-space: nowrap;
+        background-color: transparent;
+        border: 0;
+    }
+
+    .dropdown-divider {
+        height: 0;
+        margin: .5rem 0;
+        overflow: hidden;
+        border-top: 1px solid #e9ecef;
+    }
+
+</style>
+
+<div class="page">
+    <main>
+       
+        <div class="top-row px-4">
+
+
+            @if (UserStateService.LoggedInUser != null)
+            {
+                <div class="dropdown" @onclick="ToggleDropdown">
+                    <button class="btn btn-secondary" type="button">
+                        Welcome, @UserStateService.LoggedInUser.Name
+                    </button>
+                    @if (isDropdownOpen)
+                    {
+                        <div class="dropdown-menu show">
+                            <span class="dropdown-item">Role: @UserStateService.LoggedInUser.Role</span>
+                            <div class="dropdown-divider"></div>
+                            <button class="dropdown-item" @onclick="HandleLogout">Logout</button>
+                        </div>
+                    }
+                </div>
+            }
+            else{
+                <NavLink class="nav-link" href="register" Match="NavLinkMatch.All">
+                    <span class="oi oi-plus" aria-hidden="true"></span> Register
+                </NavLink>
+            }
+
+        </div>
+    
+
+        <article class="content px-4">
+            @Body
+        </article>
+    </main>
+</div>
+
+@code {
+
+    private bool isDropdownOpen = false;
+
+    protected override void OnInitialized()
+    {
+        UserStateService.OnChange += StateHasChanged;
+    }
+
+    public void Dispose()
+    {
+        UserStateService.OnChange -= StateHasChanged;
+    }
+
+    private void ToggleDropdown()
+    {
+        isDropdownOpen = !isDropdownOpen;
+    }
+
+    private async Task HandleLogout()
+    {
+        await AuthService.Logout();
+        UserStateService.SetLoggedInUser(null);
+        NavigationManager.NavigateTo("/login");
+    }
+
+}

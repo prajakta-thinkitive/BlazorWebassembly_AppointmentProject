@@ -1,0 +1,193 @@
+﻿@page "/doctors/details/{Id:int}"
+@inject BlazorWebassembly_Appointment.Client.Services.DoctorService DoctorService
+@inject NavigationManager NavigationManager
+@using BlazorWebassembly_Appointment.Shared
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private DoctorDetail doctor = new DoctorDetail();
+
+    protected override async Task OnInitializedAsync()
+    {
+        doctor = await DoctorService.GetDoctor(Id);
+    }
+
+    private void GoBack()
+    {
+        NavigationManager.NavigateTo("/doctors");
+    }
+
+    private void BookAppointment()
+    {
+        
+        NavigationManager.NavigateTo($"/appointments/book/{Id}");
+    }
+}
+
+<style>
+    body {
+        background-color: #f8f9fa;
+        background-image: url('/Images/Clinic_background.jpg');
+        opacity: 0.9;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+    }
+    .container {
+        background-color: #ffffff;
+        overflow-y: scroll;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        margin: 50px auto;
+    }
+    .page-title {
+        color: #333;
+        margin-bottom: 20px;
+    }
+
+    .container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 20px;
+    }
+
+    .profile-section {
+        flex: 1;
+        max-width: 300px; 
+        background: url(/Images/profile_image.jpg) no-repeat center center;
+    }
+
+    .details-section {
+        flex: 2;
+        max-width: 600px; 
+    }
+
+    .doctor-details {
+
+        padding: 20px;
+        background-color: #f9f9f9;
+        border-radius: 5px;
+    }
+
+    .detail-row {
+        margin-bottom: 10px;
+    }
+
+    .detail-label {
+        font-weight: bold;
+    }
+
+    .detail-value {
+        margin-left: 10px;
+    }
+
+    .profile-image {
+        max-width: 100%;
+        border-radius: 5px;
+    }
+
+    .button-group {
+        margin-top: 20px;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .back-btn, .book-appointment-btn {
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+        .back-btn:hover, .book-appointment-btn:hover {
+            background-color: #0056b3;
+        }
+
+    .back_arrow_div {
+        display: flex;
+    }
+
+    .back_button {
+        margin-bottom: 24px;
+        margin-left: 30px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 43px;
+        height: 43px;
+        border: 1px solid var(--text-color-level3, rgba(26, 26, 26, 0.1));
+        border-radius: 50%;
+        background-color: white;
+        background-clip: padding-box;
+        color: var(--primary-color, rgb(0, 105, 255));
+        font-size: 24px;
+    }
+
+    .newback_btn {
+        position: relative;
+        display: inline-block;
+        font-weight: 400;
+        font-style: normal;
+        font-variant: normal;
+        font-family: icomoon;
+        line-height: 1;
+        text-transform: none;
+        speak: none;
+        -webkit-font-smoothing: antialiased;
+    }
+
+</style>
+
+
+<div class="container">
+    <div class="back_arrow_div">
+        <button class="back_button" @onclick="GoBack">
+            <span class="newback_btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                    <path d="M0 0h24v24H0z" fill="none" />
+                    <path d="M14 7l-5 5 5 5V7z" />
+                </svg>
+            </span>
+        </button>
+    </div>
+    <div class="profile-section">
+        <img src="@doctor.ProfileImage" alt="Profile Image" class="profile-image" />
+    </div>
+    <div class="details-section">
+        <div class="doctor-details">
+            <h4>@doctor.Name</h4>
+            <div class="detail-row">
+                <span class="detail-label">Specialty:</span>
+                <span class="detail-value">@doctor.Specialty</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Email:</span>
+                <span class="detail-value">@doctor.Email</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Mobile Number:</span>
+                <span class="detail-value">@doctor.MobileNumber</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Education:</span>
+                <span class="detail-value">@doctor.Education</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Treatment:</span>
+                <span class="detail-value">@doctor.Treatment</span>
+            </div>
+            <div class="button-group">
+            
+              <button class="book-appointment-btn" @onclick="BookAppointment">Book Appointment</button>
+            </div>
+        </div>
+    </div>
+</div>

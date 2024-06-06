@@ -1,0 +1,44 @@
+﻿@page "/products/edit/{id:int}"
+@inject BlazorWebassembly_Appointment.Client.Services.ProductService ProductService
+@inject NavigationManager NavigationManager
+@using BlazorWebassembly_Appointment.Shared
+
+<h3>Edit Product</h3>
+
+@if (product == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <EditForm Model="@product" OnValidSubmit="HandleValidSubmit">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="form-group">
+            <label for="name">Name</label>
+            <InputText id="name" class="form-control" @bind-Value="product.Name" />
+        </div>
+        <div class="form-group">
+            <label for="price">Price</label>
+            <InputNumber id="price" class="form-control" @bind-Value="product.Price" />
+        </div>
+        <button type="submit" class="btn btn-primary">Save</button>
+    </EditForm>
+}
+
+@code {
+    [Parameter] public int id { get; set; }
+    private Product product;
+
+    protected override async Task OnInitializedAsync()
+    {
+        product = await ProductService.GetProduct(id);
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        await ProductService.UpdateProduct(product);
+        NavigationManager.NavigateTo("/products");
+    }
+}

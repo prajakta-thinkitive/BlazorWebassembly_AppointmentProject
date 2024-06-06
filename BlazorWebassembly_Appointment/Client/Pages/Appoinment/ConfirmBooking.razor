@@ -1,0 +1,148 @@
+﻿@page "/confirm-booking/{DoctorId:int}/{selectedDate:datetime}/{slot}"
+@using System.Globalization
+@inject NavigationManager NavigationManager
+@inject HttpClient Http
+@inject BlazorWebassembly_Appointment.Client.Services.AppointmentService AppointmentService
+@inject BlazorWebassembly_Appointment.Client.Services.DoctorService DoctorService
+@using BlazorWebassembly_Appointment.Shared
+
+
+
+<style>
+
+    body {
+        background-color: #f8f9fa;
+        background-image: url('/Images/Clinic_background.jpg');
+        opacity: 0.9;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+    }
+</style>
+
+<div class="main-container">
+    <div class="container_heading">
+        <div class="back_arrow_div">
+            <button class="back_button" @onclick="GoBack">
+                <span class="newback_btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                        <path d="M0 0h24v24H0z" fill="none" />
+                        <path d="M14 7l-5 5 5 5V7z" />
+                    </svg>
+                </span>
+            </button>
+        </div>
+
+
+        <div class="maintime_div">
+            <input id="doctor" name="doctor" style="border:none;font-size: x-large;font-weight: 600;" value="Dr.@doctor.Name" readonly />
+            <hr />
+            <div class="meetingheading_div">
+                <h2 class="meeting_heading">30 Minute Booking</h2>
+            </div>
+            <div class="dataContainer_details">
+                <div class="min_detail_div">
+                    <div class="min_spantag_div">
+                        <span aria-hidden="true" class="min_span">
+                            <svg data-id="details-item-icon" viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg" role="img">
+                                <path d="M.5 5a4.5 4.5 0 1 0 9 0 4.5 4.5 0 1 0-9 0Z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"></path>
+                                <path d="M5 3.269V5l1.759 2.052" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"></path>
+                            </svg>
+                        </span>
+                    </div>
+                    30 &nbsp; min
+                </div>
+
+                <div class="main_datetime_div">
+                    <div class="datetime_main_span_div">
+                        <span aria-hidden="true" class="main_datetime_spantag">
+                            <svg data-id="details-item-icon" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" role="img">
+                                <path fill-rule="evenodd" clip-rule="evenodd" d="M6 0.999512C6 0.447227 5.55229 -0.000488281 5 -0.000488281C4.44772 -0.000488281 4 0.447227 4 0.999512V1.99951H3C2.20435 1.99951 1.44129 2.31558 0.87868 2.87819C0.316071 3.4408 0 4.20386 0 4.99951V7.99951V16.9995C0 17.7952 0.316071 18.5582 0.87868 19.1208C1.44129 19.6834 2.20435 19.9995 3 19.9995H17C17.7957 19.9995 18.5587 19.6834 19.1213 19.1208C19.6839 18.5582 20 17.7952 20 16.9995V7.99951V4.99951C20 4.20386 19.6839 3.4408 19.1213 2.87819C18.5587 2.31558 17.7957 1.99951 17 1.99951H16V0.999512C16 0.447227 15.5523 -0.000488281 15 -0.000488281C14.4477 -0.000488281 14 0.447227 14 0.999512V1.99951H6V0.999512ZM18 6.99951V4.99951C18 4.7343 17.8946 4.47994 17.7071 4.29241C17.5196 4.10487 17.2652 3.99951 17 3.99951H15.001L15 3.99951L14.999 3.99951H5.00099L5 3.99951L4.99901 3.99951H3C2.73478 3.99951 2.48043 4.10487 2.29289 4.29241C2.10536 4.47994 2 4.7343 2 4.99951V6.99951H18ZM2 8.99951H18V16.9995C18 17.2647 17.8946 17.5191 17.7071 17.7066C17.5196 17.8942 17.2652 17.9995 17 17.9995H3C2.73478 17.9995 2.48043 17.8942 2.29289 17.7066C2.10536 17.5191 2 17.2647 2 16.9995V8.99951Z" fill="currentColor"></path>
+                            </svg>
+                        </span>
+                    </div>
+                    <p> @SelectedDate.ToString("MMMM dd, yyyy")</p>
+                    <p> @Slot</p>
+                </div>
+                <div class="standardtime_div">
+                    <span aria-hidden="true" class="standerd_time_logo">
+                        <svg id="details_span_tag_icon" viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg" role="img">
+                            <path d="M.5 5a4.5 4.5 0 1 0 9 0 4.5 4.5 0 1 0-9 0Z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"></path>
+                            <path d="M.846 6.731h1.212a1.212 1.212 0 0 0 1.211-1.212V4.481a1.212 1.212 0 0 1 1.212-1.212 1.211 1.211 0 0 0 1.211-1.211V0.553M9.5 4.929a2.469 2.469 0 0 0-1.117-.275H6.9a1.212 1.212 0 1 0 0 2.423.865.865 0 0 1 .865.865v.605" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"></path>
+                        </svg>
+                    </span>
+                    <span class="standerd_time_text">India Standard Time</span>
+                </div>
+
+            </div>
+        </div>
+
+      
+
+        <div class="container">
+            <h2 class="enterDetail">Enter Details</h2>
+
+          <EditForm Model="@appointment" OnValidSubmit="HandleValidSubmit">
+             <DataAnnotationsValidator />
+               <ValidationSummary />
+
+                <div class="form-group">
+                <label>Name:</label>
+                <InputText id="name" @bind-Value="appointment.Name" />
+                </div>
+                <div class="form-group">
+                <label>Email:</label>
+                <InputText id="email" @bind-Value="appointment.Email" />
+                </div>
+                <div class="form-group">
+                <label>Description:</label>
+                <InputTextArea id="description" @bind-Value="appointment.Description" />
+                </div>
+                <button type="submit">Confirm Appointment</button>
+        </EditForm>
+   </div>
+
+    </div>
+
+</div>
+
+
+
+@code {
+    @code {
+        [Parameter]
+        public int DoctorId { get; set; }
+        private DoctorDetail doctor = new DoctorDetail();
+
+
+        [Parameter]
+        public DateTime SelectedDate { get; set; }
+
+        [Parameter]
+        public string Slot { get; set; }
+
+        private AppointmentModel appointment = new AppointmentModel();
+
+        private async Task HandleValidSubmit()
+        {
+            appointment.DoctorId = DoctorId;
+            appointment.SelectedDate = SelectedDate;
+            appointment.Slot = Slot;
+
+            // Call the service to create the appointment
+            await AppointmentService.CreateAppointmentAsync(appointment);
+            NavigationManager.NavigateTo("/doctors");
+        }
+        protected override async Task OnInitializedAsync()
+        {
+            doctor = await DoctorService.GetDoctor(DoctorId);
+        }
+
+        private void GoBack()
+        {
+            NavigationManager.NavigateTo("/doctors");
+        }
+
+    }
+}

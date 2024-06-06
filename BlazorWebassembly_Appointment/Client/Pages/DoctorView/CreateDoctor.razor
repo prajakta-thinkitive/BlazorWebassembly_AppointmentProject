@@ -1,0 +1,82 @@
+﻿@page "/doctors/create"
+@inject BlazorWebassembly_Appointment.Client.Services.DoctorService DoctorService
+@inject NavigationManager NavigationManager
+@using BlazorWebassembly_Appointment.Shared
+
+<style>
+    body {
+        background-color: #f8f9fa;
+        background-image: url('/Images/Clinic_background.jpg');
+        opacity: 0.9;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+    }
+
+    .container {
+        background-color: #ffffff;
+        overflow-y: scroll;
+        height: 600px;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        max-width: 600px;
+        width: 100%;
+        margin: 50px auto;
+    }
+</style>
+
+<div class="container">
+    <h3>Create Doctor</h3>
+    <hr />
+    <EditForm Model="@doctor" OnValidSubmit="HandleValidSubmit">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="form-group">
+            <label for="name">Name</label>
+            <InputText id="name" class="form-control" @bind-Value="doctor.Name" />
+        </div>
+        <div class="form-group">
+            <label for="specialty">Specialty</label>
+            <InputText id="specialty" class="form-control" @bind-Value="doctor.Specialty" />
+        </div>
+        <div class="form-group">
+            <label for="email">Email</label>
+            <InputText id="email" class="form-control" @bind-Value="doctor.Email" />
+        </div>
+        <div class="form-group">
+            <label for="mobileNumber">Mobile Number</label>
+            <InputText id="mobileNumber" class="form-control" @bind-Value="doctor.MobileNumber" />
+        </div>
+        <div class="form-group">
+            <label for="education">Education</label>
+            <InputText id="education" class="form-control" @bind-Value="doctor.Education" />
+        </div>
+        <div class="form-group">
+            <label for="treatment">Treatment</label>
+            <InputText id="treatment" class="form-control" @bind-Value="doctor.Treatment" />
+        </div>
+        <div class="form-group">
+            <label for="profileImage">Profile Image URL</label>
+            <InputText id="profileImage" class="form-control" @bind-Value="doctor.ProfileImage" />
+        </div>
+
+        <button type="submit" class="btn btn-primary">Submit</button>
+        <a href="doctors" type="submit">Back to list</a>
+
+    </EditForm>
+</div>
+
+
+@code {
+    private DoctorDetail doctor = new DoctorDetail();
+
+    private async Task HandleValidSubmit()
+    {
+        await DoctorService.CreateDoctor(doctor);
+        NavigationManager.NavigateTo("/doctors");
+    }
+}
+

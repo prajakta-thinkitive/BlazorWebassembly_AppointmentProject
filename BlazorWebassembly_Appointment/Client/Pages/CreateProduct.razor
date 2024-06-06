@@ -1,0 +1,31 @@
+﻿@page "/products/create"
+@inject BlazorWebassembly_Appointment.Client.Services.ProductService ProductService
+@inject NavigationManager NavigationManager
+@using BlazorWebassembly_Appointment.Shared
+
+<h3>Create Product</h3>
+
+<EditForm Model="@product" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label for="name">Name</label>
+        <InputText id="name" class="form-control" @bind-Value="product.Name" />
+    </div>
+    <div class="form-group">
+        <label for="price">Price</label>
+        <InputNumber id="price" class="form-control" @bind-Value="product.Price" />
+    </div>
+    <button type="submit" class="btn btn-primary">Create</button>
+</EditForm>
+
+@code {
+    private Product product = new Product();
+
+    private async Task HandleValidSubmit()
+    {
+        await ProductService.CreateProduct(product);
+        NavigationManager.NavigateTo("/products");
+    }
+}
