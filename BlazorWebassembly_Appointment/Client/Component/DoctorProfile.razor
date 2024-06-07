@@ -1,0 +1,156 @@
+﻿@page "/doctor_profile"
+@using BlazorWebassembly_Appointment.Shared
+@inject BlazorWebassembly_Appointment.Client.Services.DoctorService DoctorService
+@inject BlazorWebassembly_Appointment.Client.Services.AuthService AuthService
+@inject BlazorWebassembly_Appointment.Client.Services.UserStateService UserStateService
+@inject NavigationManager NavigationManager
+
+<style>
+    .profile-container {
+        background-color: #ffffff;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        width: 53%;
+        margin-top: 0%;
+        margin: 50px auto;
+    }
+
+    .profile-heading {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .profile-details {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+        .profile-details img {
+            border-radius: 50%;
+            width: 100px;
+            height: 150px;
+            object-fit: cover;
+            margin-bottom: 20px;
+        }
+
+        .profile-details div {
+            margin-bottom: 10px;
+        }
+
+    .edit-btn {
+        margin-top: 20px;
+    }
+
+    .profile-info {
+        flex: 1;
+    }
+
+        .profile-info p {
+            margin: 10px 0;
+            font-size: 16px;
+        }
+
+        .profile-info strong {
+            color: #333;
+        }
+
+    .gradient-custom {
+        background: #f6d365;
+        background: -webkit-linear-gradient(to right bottom, rgba(246, 211, 101, 1), rgba(253, 160, 133, 1));
+        background: linear-gradient(to right bottom, rgba(246, 211, 101, 1), rgba(253, 160, 133, 1))
+    }
+</style>
+
+<section class="vh-100" style="background-color: #f4f5f7;">
+    <div class="container py-5 h-100">
+        <div class="row d-flex justify-content-center align-items-center h-100">
+            <div class="col col-lg-6 mb-4 mb-lg-0">
+                <div class="card mb-3" style="border-radius: .5rem;">
+                    <div class="row g-0">
+                        <div class="col-md-4 gradient-custom text-center text-white"
+                             style="border-top-left-radius: .5rem; border-bottom-left-radius: .5rem; background-color: #6c757d;">
+                            <img src="@doctor.ProfileImage" alt="Avatar" class="img-fluid my-5" style="width: 80px;" />
+                            <h5>@doctor.Name</h5>
+                            <p>@doctor.Specialty</p>
+                            <i class="far fa-edit mb-5" @onclick="EditProfile" style="cursor: pointer;"></i>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="card-body p-4">
+                                <h6>Information</h6>
+                                <hr class="mt-0 mb-4">
+                                <div class="row pt-1">
+                                    <div class="col-6 mb-3">
+                                        <h6>Email</h6>
+                                        <p class="text-muted">@doctor.Email</p>
+                                    </div>
+                                    <div class="col-6 mb-3">
+                                        <h6>Phone</h6>
+                                        <p class="text-muted">@doctor.MobileNumber</p>
+                                    </div>
+                                </div>
+                                <h6>Education</h6>
+                                <hr class="mt-0 mb-4">
+                                <div class="row pt-1">
+                                    <div class="col-12 mb-3">
+                                        <h6>Education</h6>
+                                        <p class="text-muted">@doctor.Education</p>
+                                    </div>
+                                </div>
+                                <h6>Treatment</h6>
+                                <hr class="mt-0 mb-4">
+                                <div class="row pt-1">
+                                    <div class="col-12 mb-3">
+                                        <h6>Treatment</h6>
+                                        <p class="text-muted">@doctor.Treatment</p>
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-start">
+                                    <a href="#!"><i class="fab fa-facebook-f fa-lg me-3"></i></a>
+                                    <a href="#!"><i class="fab fa-twitter fa-lg me-3"></i></a>
+                                    <a href="#!"><i class="fab fa-instagram fa-lg"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+@code {
+    private DoctorDetail doctor;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Get the logged-in user's information
+        var user = await AuthService.GetLoggedInUser();
+        UserStateService.SetLoggedInUser(user);
+
+        Console.WriteLine($"Usealier :{user}");
+
+        if (UserStateService.LoggedInUser.Role.Trim().Equals("Doctor", StringComparison.OrdinalIgnoreCase))
+        {
+            // Get the doctor's profile details
+            doctor = await DoctorService.GetCurrentDoctor();
+            doctor.ProfileImage = "/Images/profile_image.jpg";
+        }
+
+        // Get the doctor's profile details
+       // doctor = await DoctorService.GetCurrentDoctor();
+    }
+
+    private void EditProfile()
+    {
+        NavigationManager.NavigateTo($"/editdoctor/{doctor.Id}");
+    }
+
+    private void ViewAppointments(int id)
+    {
+        NavigationManager.NavigateTo($"/doctors/{id}/appointments");
+    }
+}

@@ -73,6 +73,9 @@ namespace BlazorWebassembly_Appointment.Server.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool?>("IsChecked")
+                        .HasColumnType("bit");
+
                     b.Property<string>("MobileNumber")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -146,21 +149,21 @@ namespace BlazorWebassembly_Appointment.Server.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "29ce18c8-d6db-4546-9329-54aabd8c18f2",
+                            Id = "e09a9143-6805-48af-85f5-6fbe48ce6d11",
                             ConcurrencyStamp = "1",
                             Name = "Admin",
                             NormalizedName = "Admin"
                         },
                         new
                         {
-                            Id = "597486fa-2035-4d8c-8889-eed9b0bee9c7",
+                            Id = "39062d2e-816c-4857-9508-24801152fe91",
                             ConcurrencyStamp = "2",
                             Name = "User",
                             NormalizedName = "User"
                         },
                         new
                         {
-                            Id = "8ff899be-d23a-441b-9b4a-a580e0b08d01",
+                            Id = "12da2844-d5e2-42a5-9f1c-13dcefbdcd86",
                             ConcurrencyStamp = "3",
                             Name = "Doctor ",
                             NormalizedName = "Doctor"

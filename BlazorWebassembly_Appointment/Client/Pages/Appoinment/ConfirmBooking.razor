@@ -38,9 +38,9 @@
         <div class="maintime_div">
             <input id="doctor" name="doctor" style="border:none;font-size: x-large;font-weight: 600;" value="Dr.@doctor.Name" readonly />
             <hr />
-            <div class="meetingheading_div">
+           @*  <div class="meetingheading_div">
                 <h2 class="meeting_heading">30 Minute Booking</h2>
-            </div>
+            </div> *@
             <div class="dataContainer_details">
                 <div class="min_detail_div">
                     <div class="min_spantag_div">
@@ -89,15 +89,15 @@
 
                 <div class="form-group">
                 <label>Name:</label>
-                <InputText id="name" @bind-Value="appointment.Name" />
+                    <InputText id="name" class="form-control" @bind-Value="appointment.Name" />
                 </div>
                 <div class="form-group">
                 <label>Email:</label>
-                <InputText id="email" @bind-Value="appointment.Email" />
+                    <InputText id="email" class="form-control" @bind-Value="appointment.Email" />
                 </div>
                 <div class="form-group">
                 <label>Description:</label>
-                <InputTextArea id="description" @bind-Value="appointment.Description" />
+                    <InputTextArea id="description" class="form-control" @bind-Value="appointment.Description" />
                 </div>
                 <button type="submit">Confirm Appointment</button>
         </EditForm>

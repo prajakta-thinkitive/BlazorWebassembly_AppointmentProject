@@ -29,8 +29,7 @@ namespace BlazorWebassembly_Appointment.Client.Services
 
         public async Task Logout()
         {
-             await _httpClient.PostAsync("api/Authentication/Logout",null);
-           
+            await _httpClient.PostAsync("api/Authentication/Logout",null);
         }
 
         public async Task<CurrentUserDto> GetLoggedInUser()
@@ -48,3 +47,4 @@ namespace BlazorWebassembly_Appointment.Client.Services
 
     }
 }
+

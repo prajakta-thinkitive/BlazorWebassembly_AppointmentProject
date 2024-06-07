@@ -46,5 +46,12 @@ namespace BlazorWebassembly_Appointment.Client.Services
                 return null;
             }
         }
+
+        public async Task<List<string>> GetBookedSlots(int doctorId, DateTime date)
+        {
+            var response = await _httpClient.GetAsync($"api/appointment/{doctorId}/{date.ToString("yyyy-MM-dd")}");
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadFromJsonAsync<List<string>>();
+        }
     }
 }

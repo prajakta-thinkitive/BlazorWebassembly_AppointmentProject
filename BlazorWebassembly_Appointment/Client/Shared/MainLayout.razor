@@ -100,6 +100,8 @@
                         <div class="dropdown-menu show">
                             <span class="dropdown-item">Role: @UserStateService.LoggedInUser.Role</span>
                             <div class="dropdown-divider"></div>
+                            @* <button class="dropdown-item" @onclick="profileView">Profile</button> *@
+                            <div class="dropdown-divider"></div>
                             <button class="dropdown-item" @onclick="HandleLogout">Logout</button>
                         </div>
                     }
@@ -143,7 +145,12 @@
     {
         await AuthService.Logout();
         UserStateService.SetLoggedInUser(null);
-        NavigationManager.NavigateTo("/login");
+        NavigationManager.NavigateTo("/");
+    }
+
+    private async Task profileView()
+    {
+        NavigationManager.NavigateTo("/profile_view");
     }
 
 }

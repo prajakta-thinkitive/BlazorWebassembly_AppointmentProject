@@ -1,0 +1,45 @@
+﻿@page "/active-doctors"
+@using BlazorWebassembly_Appointment.Shared
+@inject BlazorWebassembly_Appointment.Client.Services.DoctorService DoctorService
+
+<div class="container">
+    <h3>Active Doctors</h3>
+
+    @if (doctors == null || doctors.Count == 0)
+    {
+        <p>No active doctors found.</p>
+    }
+    else
+    {
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Specialty</th>
+                    <th>Education</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var doctor in doctors)
+                {
+                    <tr>
+                        <td>@doctor.Name</td>
+                        <td>@doctor.Email</td>
+                        <td>@doctor.Specialty</td>
+                        <td>@doctor.Education</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
+
+@code {
+    private List<DoctorDetail> doctors;
+
+    protected override async Task OnInitializedAsync()
+    {
+        doctors = await DoctorService.GetActiveDoctors();
+    }
+}

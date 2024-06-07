@@ -55,5 +55,16 @@ namespace BlazorWebassembly_Appointment.Server.Controllers
                 return StatusCode(500, "An error occurred while fetching appointments.");
             }
         }
+
+        [HttpGet("{doctorId}/{date}")]
+        public async Task<IActionResult> GetBookedSlots(int doctorId, DateTime date)
+        {
+            var bookedSlots = await _context.Appointments
+                .Where(a => a.DoctorId == doctorId && a.SelectedDate.Date == date.Date)
+                .Select(a => a.Slot)
+                .ToListAsync();
+
+            return Ok(bookedSlots);
+        }
     }
 }

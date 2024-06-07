@@ -19,7 +19,7 @@
         {
             var loggedInUser = await AuthService.GetLoggedInUser();
             UserStateService.SetLoggedInUser(loggedInUser);
-            NavigationManager.NavigateTo("/login");
+            NavigationManager.NavigateTo("/");
         }
         else
         {
@@ -96,7 +96,7 @@
         <div class="form-buttons" style="display:flex">
             <button type="submit" class="btn btn-primary">Register</button>
         </div>
-            <a href="/login">Login</a>
+            <a href="/">Login</a>
      
         @if (!string.IsNullOrEmpty(errorMessage))
         {
@@ -106,7 +106,10 @@
 </div>
 
 <style>
+
     .register-container {
+        overflow-y:scroll;
+        height:20%;
         background-color: #ffffff;
         padding: 60px;
         border-radius: 8px;
@@ -115,7 +118,6 @@
         width: 100%;
         margin-left: auto;
         margin-right: auto;
-        margin-top: 2%;
     }
 
     h2 {
@@ -136,7 +138,7 @@
     }
 
     .btn-primary {
-       
+       width:100%;
         padding: 10px;
         background-color: #007bff;
         border: none;

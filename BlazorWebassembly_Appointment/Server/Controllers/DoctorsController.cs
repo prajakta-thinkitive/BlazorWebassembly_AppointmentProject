@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace BlazorWebassembly_Appointment.Server.Controllers
 {
@@ -169,6 +170,67 @@ namespace BlazorWebassembly_Appointment.Server.Controllers
             }
         }
 
+
+        [HttpPut("{id}/status")]
+        public async Task<IActionResult> UpdateDoctorStatus(int id, [FromBody] bool isChecked)
+        {
+            var doctor = await _context.DoctorDetails.FindAsync(id);
+            if (doctor == null)
+            {
+                return NotFound("Doctor not found");
+            }
+
+            doctor.IsChecked = isChecked;
+            _context.Entry(doctor).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!DoctorDetailExists(id))
+                {
+                    return NotFound("Doctor not found");
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
+        }
+        private bool DoctorDetailExists(int id)
+        {
+            return _context.DoctorDetails.Any(e => e.Id == id);
+        }
+
+        [HttpGet("GetActiveDoctors")]
+        public async Task<ActionResult<IEnumerable<DoctorDetail>>> GetActiveDoctors()
+        {
+            return await _context.DoctorDetails.Where(d => d.IsChecked ?? false).ToListAsync();   
+        }
+
+
+        //New
+        [HttpGet("me")]
+        public async Task<ActionResult<DoctorDetail>> GetCurrentDoctor()
+        {
+            var userEmail = User.FindFirstValue(ClaimTypes.Email);
+            if (userEmail == null)
+            {
+                return Unauthorized();
+            }
+
+            var doctor = await _context.DoctorDetails.FirstOrDefaultAsync(d => d.Email == userEmail);
+            if (doctor == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(doctor);
+        }
     }
 }
 

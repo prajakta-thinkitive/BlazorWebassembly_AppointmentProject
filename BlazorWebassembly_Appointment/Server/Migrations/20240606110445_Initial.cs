@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace BlazorWebassembly_Appointment.Server.Migrations
 {
     /// <inheritdoc />
-    public partial class NewMigration : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -82,7 +82,8 @@ namespace BlazorWebassembly_Appointment.Server.Migrations
                     MobileNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Education = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Treatment = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ProfileImage = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    ProfileImage = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsChecked = table.Column<bool>(type: "bit", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -214,9 +215,9 @@ namespace BlazorWebassembly_Appointment.Server.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "29ce18c8-d6db-4546-9329-54aabd8c18f2", "1", "Admin", "Admin" },
-                    { "597486fa-2035-4d8c-8889-eed9b0bee9c7", "2", "User", "User" },
-                    { "8ff899be-d23a-441b-9b4a-a580e0b08d01", "3", "Doctor ", "Doctor" }
+                    { "12da2844-d5e2-42a5-9f1c-13dcefbdcd86", "3", "Doctor ", "Doctor" },
+                    { "39062d2e-816c-4857-9508-24801152fe91", "2", "User", "User" },
+                    { "e09a9143-6805-48af-85f5-6fbe48ce6d11", "1", "Admin", "Admin" }
                 });
 
             migrationBuilder.CreateIndex(

@@ -1,0 +1,84 @@
+﻿@page "/profile_view"
+
+@inject NavigationManager Navigation
+
+
+<style>
+    body {
+        background-color: #f8f9fa;
+        background-image: url('/Images/Clinic_background.jpg');
+        opacity: 0.9;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+    }
+    .profile-container {
+        background-color: #ffffff;
+        padding: 26px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        max-width: 400px;
+        width: 100%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    h2 {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .form-control {
+        border-radius: 4px;
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 10px;
+        border: 1px solid #ccc;
+    }
+    
+</style>
+
+<div class="profile-container">
+   
+        <div class="profile-header">
+            <img src="/Images/profile_image.jpg" alt="Profile Image" class="profile-image" />
+            <h2>UserName</h2>
+        </div>
+        <div class="profile-details">
+            <p><strong>Email:</strong></p>
+            <p><strong>Role:</strong></p>
+            <p><strong>View Appointments :</strong></p>
+        </div>
+    <button class="btn btn-primary" style="width: 31%;">Edit Profile</button>
+    
+</div>
+
+@code {
+    // private IdentityUser user;
+    // private string userRole;
+
+    // protected override async Task OnInitializedAsync()
+    // {
+    //     var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+    //     var userClaims = authState.User;
+
+    //     if (userClaims.Identity.IsAuthenticated)
+    //     {
+    //         user = await UserManager.GetUserAsync(userClaims);
+    //         var roles = await UserManager.GetRolesAsync(user);
+    //         userRole = roles.FirstOrDefault();
+    //         // Load user profile image URL if available
+    //         userProfileImage = userClaims.FindFirst("ProfileImageUrl")?.Value ?? userProfileImage;
+    //     }
+    // }
+
+    // private void EditProfile()
+    // {
+    //     Navigation.NavigateTo("/edit-profile");
+    // }
+}

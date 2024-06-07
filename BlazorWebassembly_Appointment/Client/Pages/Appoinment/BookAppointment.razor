@@ -1,7 +1,7 @@
 ﻿@page "/appointments/book/{DoctorId:int}"
 @inject NavigationManager Navigation
 @inject BlazorWebassembly_Appointment.Client.Services.DoctorService DoctorService
- 
+@inject BlazorWebassembly_Appointment.Client.Services.AppointmentService AppointmentService
 @using BlazorWebassembly_Appointment.Shared
 @using System
 
@@ -15,6 +15,18 @@
         background-repeat: no-repeat;
         background-attachment: fixed;
     }
+    .booked {
+    background-color: #f44336;
+    color: white;
+    border: none;
+    padding: 10px 24px;
+    text-align: center;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: not-allowed;
+    border-radius: 12px;
+}
 </style>
 
 <div class="container">
@@ -42,10 +54,10 @@
                                     <div class="context_main">
                                         <div class="contaxt_minute_div">
                                             <div class="name_heading_div_class">
-                                                <input id="doctor" name="doctor" style="border:none;font-size: x-large;font-weight: 600;" value="@doctor.Name" readonly />
+                                                <input id="doctor" name="doctor" style="border:none;font-size: x-large;font-weight: 600;" value="Dr.@doctor.Name" readonly />
                                             </div>
                                             <div style="margin-top: 23px;">
-                                              <h1 class="minute_heading_div_class">30 Minute Meeting</h1>
+                                                <h1 class="minute_heading_div_class">30-Minute Health Check</h1>
                                             </div>
                                         </div>
                                         <div class="context_sub_minute_div">
@@ -102,11 +114,6 @@
                             <div class="main_calender_container">
                                 <table class="calendar">
                                     <thead>
-                                        @*   <tr>
-                                        <th colspan="7">
-                                        <span>@currentMonth</span>
-                                        </th>
-                                        </tr> *@
                                         <tr>
                                             <th>Sun</th>
                                             <th>Mon</th>
@@ -124,7 +131,7 @@
                                                 @foreach (var day in week)
                                                 {
                                                     <td class="@day.CssClass" @onclick="() => SelectDate(day.Date)">
-                                                        @day.Date.Day
+                                                        @(day.Date != DateTime.MinValue ? day.Date.Day.ToString() : string.Empty)
                                                     </td>
                                                 }
                                             </tr>
@@ -140,9 +147,10 @@
                     <h3 class="selected_dateclass"><span>@selectedDate.ToShortDateString()</span></h3>
                     <div class="spotpicker_times_list">
                         <div id="time-buttons">
+
                             @foreach (var slot in timeSlots)
                             {
-                                <button class="@GetSlotClass(slot)" @onclick="() => BookSlot(slot)">@slot</button>
+                                <button class="@GetSlotClass(slot)" @onclick="() => BookSlot(slot)" disabled="@IsSlotBooked(slot)">@slot</button>
                             }
                         </div>
                         @if (showNextButton)
@@ -161,7 +169,7 @@
     [Parameter]
     public int DoctorId { get; set; }
     private DoctorDetail doctor = new DoctorDetail();
-   
+
 
     [Parameter] public List<string> SelectedSlotsList { get; set; }
     [Parameter] public List<string> SelectedDatesList { get; set; }
@@ -173,10 +181,6 @@
     private List<string> timeSlots = new List<string>();
     private List<string> bookedSlots = new List<string>();
 
-    // protected override void OnInitialized()
-    // {
-    //     LoadCalendar();
-    // }
 
     protected override async Task OnInitializedAsync()
     {
@@ -235,16 +239,19 @@
         LoadCalendar();
     }
 
-    private void SelectDate(DateTime date)
+    private async void SelectDate(DateTime date)
     {
         selectedDate = date;
-        LoadTimeSlots();
+        await LoadTimeSlots();
     }
 
-    private void LoadTimeSlots()
+    private async Task LoadTimeSlots()
     {
         // Replace with your logic to load time slots for the selected date
-        timeSlots = new List<string> { "10:00 AM", "10:30 AM", "11:00 AM","11:30 AM","12:00 AM","01:00 PM","1:30 PM" };
+        timeSlots = new List<string> { "10:00 AM", "10:30 AM", "11:00 AM", "11:30 AM", "12:00 AM", "01:00 PM", "1:30 PM" };
+
+        // Fetch the booked slots for the selected date and doctor
+        bookedSlots = await AppointmentService.GetBookedSlots(DoctorId, selectedDate);
     }
 
     private bool showNextButton = false;
@@ -256,31 +263,27 @@
 
     private bool IsSlotBooked(string slot)
     {
-        // Your logic to check if the slot is already booked
-        // For example, you can check against a list of booked slots
-        // Replace this with your actual logic
         return bookedSlots.Contains(slot);
     }
+
     private void BookSlot(string slot)
     {
         if (!IsSlotBooked(slot))
         {
             Navigation.NavigateTo($"/confirm-booking/{DoctorId}/{selectedDate.ToString("yyyy-MM-dd")}/{Uri.EscapeDataString(slot)}");
             Console.WriteLine($"Booked {slot} on {selectedDate.ToShortDateString()}");
-           
         }
         else
         {
-            
-            Navigation.NavigateTo("/calenderSubmit");
             Console.WriteLine($"Slot {slot} is already booked");
-            showNextButton = true; 
+            showNextButton = false;
         }
     }
 
     private void NextButtonClicked()
     {
-        Navigation.NavigateTo("/calenderSubmit");
+        //Want to add here popup to show alredy booked
+        //Navigation.NavigateTo("/calenderSubmit");
     }
 
 
@@ -341,4 +344,3 @@
         }
     }
 }
-

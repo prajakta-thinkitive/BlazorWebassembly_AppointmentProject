@@ -67,6 +67,32 @@ namespace BlazorWebassembly_Appointment.Client.Services
             }
         }
 
+        public async Task UpdateDoctorStatus(int doctorId, bool isChecked)
+        {
+            var response = await _httpClient.PutAsJsonAsync($"api/doctors/{doctorId}/status", isChecked);
+            response.EnsureSuccessStatusCode();
+        }
+
+        public async Task<List<DoctorDetail>> GetActiveDoctors()
+        {
+            var response = await _httpClient.GetAsync("api/doctors/GetActiveDoctors");
+            response.EnsureSuccessStatusCode();
+
+            var activeDoctors = await response.Content.ReadFromJsonAsync<List<DoctorDetail>>();
+            return activeDoctors;
+        }
+
+        public async Task<DoctorDetail> GetDoctorById(int id)
+        {
+            var response = await _httpClient.GetFromJsonAsync<DoctorDetail>($"api/doctors/{id}");
+            return response;
+        }
+
+        //New 
+        public async Task<DoctorDetail> GetCurrentDoctor()
+        {
+            return await _httpClient.GetFromJsonAsync<DoctorDetail>("api/doctors/me");
+        }
 
     }
 }

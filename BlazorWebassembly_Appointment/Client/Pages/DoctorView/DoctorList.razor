@@ -11,7 +11,7 @@
 
 
 <style>
-
+    
     body {
         background-color: #f8f9fa;
         background-image: url('/Images/Clinic_background.jpg');
@@ -22,6 +22,8 @@
         background-attachment: fixed;
     }
 
+   
+
     .container {
         background-color: #ffffff;
         overflow-y: scroll;
@@ -29,7 +31,7 @@
         padding: 30px;
         border-radius: 10px;
         box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-      
+        margin-top: -6%;
         width: 100%;
         margin: 50px auto;
     }
@@ -147,38 +149,45 @@
 
 </style>
 
+
+
 <div class="container">
 
-    <div class="main_heading">
-        <h2 style="font-weight: 400;margin-top: 20px;">Search Doctor, Make an Appointment</h2>
-    </div>
+     @if (UserStateService.LoggedInUser.Role.Trim().Equals("Doctor", StringComparison.OrdinalIgnoreCase))
+    {
+        <DoctorProfile />
+    }
+    else
+    {
 
-    <div class="search-box">
-        <form @onsubmit="SearchDoctors" href="Index" method="get" style="display:flex">
-            <input type="text" @bind="searchTerm" placeholder="Search by name or specialty" class="form-control" />
-            <button @onclick="SearchDoctors" type="submit" class="btn btn-primary">Search</button>
-        </form>
-    </div>
+        <div class="main_heading">
+            <h2 style="font-weight: 400;margin-top: 20px;">Search Doctor, Make an Appointment</h2>
+        </div>
 
-    <div class="createnew_btn">
-        @if(UserStateService.LoggedInUser.Role == "Admin")
-        {
-            <div class="admin-actions">
-                <a href="doctors/view-all" class="btn btn-info" type="button">View All Doctors</a>
-                <a href="patients/view-all" class="btn btn-info" type="button">View All Patients</a>
-            </div>
-            <a href="doctors/create" class="btn btn-primary" type="button">Create Patient</a>
-        }
+        <div class="search-box">
+            <form @onsubmit="SearchDoctors" href="Index" method="get" style="display:flex">
+                <input type="text" @bind="searchTerm" placeholder="Search by name or specialty" class="form-control" />
+                <button @onclick="SearchDoctors" type="submit" class="btn btn-primary">Search</button>
+            </form>
+        </div>
 
-        @if (UserStateService.LoggedInUser.Role == "Doctor")
-        {
-            <a href="doctors/create" class="btn btn-primary" type="button">Create Patient</a>
-        }
-    </div>
+        <div class="createnew_btn">
+            @if(UserStateService.LoggedInUser.Role == "Admin")
+            {
+                <div class="admin-actions">
+                     <a href="doctors/view-all" class="btn btn-info" type="button">View All Doctors</a>
+                     <a href="patients/view-all" class="btn btn-info" type="button">View All Patients</a>
+                </div>
+                <a href="doctors/create" class="btn btn-primary" type="button">Create Patient</a>
+            }
 
-  
+            @if (UserStateService.LoggedInUser.Role == "Doctor")
+            {
+                <a href="doctors/create" class="btn btn-primary" type="button">Create Patient</a>
+            }
+        </div>
 
-
+    }
 <table class="table">
     <thead>
         <tr>
@@ -211,11 +220,11 @@
                             <button @onclick="() => ViewDetails(doctor.Id)" class="btn btn-info"><i class="fa fa-address-card icon-style"></i></button>
                             <button @onclick="() => ViewAppointments(doctor.Id)" class="btn btn-primary"><i class="fa fa-calendar icon-style"></i></button>
                         }
-                        else if (UserStateService.LoggedInUser.Role == "Doctor")
+                        else if (UserStateService.LoggedInUser.Role.Trim().Equals("Doctor", StringComparison.OrdinalIgnoreCase))
                         {
-                            <button @onclick="() => EditDoctor(doctor.Id)" class="btn btn-warning"><i class="fa fa-edit icon-style"></i></button>
-                            <button @onclick="() => ViewDetails(doctor.Id)" class="btn btn-info"><i class="fa fa-address-card icon-style"></i></button>
-                            <button @onclick="() => ViewAppointments(doctor.Id)" class="btn btn-primary"><i class="fa fa-calendar icon-style"></i></button>
+                            @* <button @onclick="() => EditDoctor(doctor.Id)" class="btn btn-warning"><i class="fa fa-edit icon-style"></i></button>
+                            <button @onclick="() => ViewAppointments(doctor.Id)" class="btn btn-primary"><i class="fa fa-calendar icon-style"></i></button> *@
+                            <button @onclick="() => ViewDetails(doctor.Id)" class="btn btn-info"><i class="fa fa-address-card icon-style"></i></button> 
                         }
                         else if (UserStateService.LoggedInUser.Role == "User")
                         {
@@ -231,12 +240,6 @@
 
 
 @code {
-    // private async Task OpenPopup()
-    // {
-       
-    //     var modal = ModalService.Show<DoctorViewAllModal>("Popup Title");
-    //     var result = await modal.Result;
-    // }
 
     private List<DoctorDetail> doctors = new List<DoctorDetail>();
     private CurrentUserDto userInfo = new CurrentUserDto();
@@ -246,9 +249,19 @@
 
     protected override async Task OnInitializedAsync()
     {
-        doctors = await DoctorService.GetDoctors();
+        
+        //doctors = await DoctorService.GetDoctors();
         // UserStateService.SetLoggedInUser(userInfo.Role);
-        //userInfo = await AuthService.GetLoggedInUser();
+        userInfo = await AuthService.GetLoggedInUser();
+        UserStateService.SetLoggedInUser(userInfo);
+
+        //Get Active Approve from Admin Doctors
+        doctors = await DoctorService.GetActiveDoctors();
+
+        
+        Console.WriteLine($"UserStateService Role after setting: {UserStateService.LoggedInUser.Role}");
+
+
     }
 
     private async Task SearchDoctors()

@@ -3,6 +3,7 @@
 
 
 .container {
+    width:60%;
     max-width: 47%;
     padding: 20px;
     background-color: #fff;
@@ -54,7 +55,7 @@ button {
 
 .main-container {
     display: flex;
-    margin-left: 10%;
+    justify-content: center;
 }
 
 .parameter_Div {

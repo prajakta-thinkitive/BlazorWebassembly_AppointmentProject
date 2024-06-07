@@ -33,6 +33,8 @@ namespace BlazorWebassembly_Appointment.Shared
 
         public string? ProfileImage { get; set; }
 
+        public bool? IsChecked { get; set; } = false;
 
+        //public string UserId { get; set; }
     }
 }

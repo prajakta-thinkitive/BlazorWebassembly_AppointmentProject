@@ -2,7 +2,7 @@
 @using BlazorWebassembly_Appointment.Shared
 @using BlazorWebassembly_Appointment.Shared.Dtos
 @inject BlazorWebassembly_Appointment.Client.Services.DoctorService DoctorService
-
+@inject NavigationManager NavigationManager
 
 
 <style>
@@ -104,6 +104,16 @@
 </style>
 
 <div class="container">
+    <div class="back_arrow_div">
+        <button class="back_button">
+            <span class="newback_btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                    <path d="M0 0h24v24H0z" fill="none" />
+                    <path d="M14 7l-5 5 5 5V7z" />
+                </svg>
+            </span>
+        </button>
+    </div>
     <h3>All Doctors</h3>
 
     @if (doctors == null || doctors.Count == 0)
@@ -112,28 +122,30 @@
     }
     else
     {
-        <form>
+        <form @onsubmit="SaveChanges">
             <table class="table">
                 <thead>
                     <tr>
+                        <th>Id</th>
                         <th>Name</th>
                         <th>Email</th>
-                        <th>Select</th> <!-- Add new column for selection -->
+                        <th>Speciality</th>
+                       
                     </tr>
                 </thead>
                 <tbody>
                     @foreach (var doctor in doctors)
                     {
                         <tr>
+                            <td>@doctor.Id</td>
                             <td>@doctor.Name</td>
                             <td>@doctor.Email</td>
-                            <th>Select</th>
+                          <td>@doctor.Specialty</td>
                             <td>
                                 <div class="toggle-button">
                                     <label class="switch">
-                                        <input type="checkbox"(model=> model)
-                                        <div class="slider round">
-                                        </div>
+                                        <input type="checkbox" @bind="doctor.IsChecked">
+                                        <span class="slider round"></span>
                                     </label>
                                 </div>
                             </td>
@@ -153,7 +165,18 @@
 
     protected override async Task OnInitializedAsync()
     {
-        doctors = await DoctorService.GetDoctorsList();
+        doctors = await DoctorService.GetDoctors();
     }
+
+    private async Task SaveChanges()
+    {
+        foreach (var doctor in doctors)
+        {
+            await DoctorService.UpdateDoctorStatus(doctor.Id, doctor.IsChecked ?? false);
+        }
+        NavigationManager.NavigateTo("/active-doctors");
+
+    }
+
    
 }
